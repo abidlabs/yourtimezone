@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Time Zone - Share Times Across Timezones</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #000;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .time-input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        input[type="time"] {
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="time"]:focus {
+            border-color: #f7931e;
+        }
+
+        select {
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            outline: none;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus {
+            border-color: #f7931e;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #000 0%, #333 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin-bottom: 20px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .shareable-url {
+            background: #f8f9fa;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            word-break: break-all;
+        }
+
+        .shareable-url a {
+            color: #f7931e;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .shareable-url a:hover {
+            text-decoration: underline;
+        }
+
+        .copy-btn {
+            background: #ff6b35;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #e55a2b;
+        }
+
+        .conversion-result {
+            background: #f8f9fa;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 30px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .conversion-result.show {
+            display: block;
+        }
+
+        .original-time {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .converted-time {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 10px;
+        }
+
+        .timezone-info {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            input[type="time"], select {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Time Zone</h1>
+        
+        <div class="time-input-section">
+            <div class="input-group">
+                <input type="time" id="timeInput" value="09:00" required>
+                <select id="timezoneSelect">
+                    <option value="">Select your timezone</option>
+                </select>
+            </div>
+            <button class="generate-btn" onclick="generateShareableUrl()">Generate Shareable Link</button>
+        </div>
+
+        <div id="shareableUrlSection" class="hidden">
+            <h3>Share this link with others:</h3>
+            <div class="shareable-url">
+                <a id="shareableUrl" href="#" target="_blank"></a>
+            </div>
+            <button class="copy-btn" onclick="copyToClipboard()">Copy Link</button>
+        </div>
+
+        <div id="conversionResult" class="conversion-result">
+            <div class="original-time" id="originalTime"></div>
+            <div class="converted-time" id="convertedTime"></div>
+            <div class="timezone-info" id="timezoneInfo"></div>
+        </div>
+    </div>
+
+    <script>
+        const timezones = [
+            { value: 'America/New_York', label: 'Eastern Time (ET)' },
+            { value: 'America/Chicago', label: 'Central Time (CT)' },
+            { value: 'America/Denver', label: 'Mountain Time (MT)' },
+            { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
+            { value: 'America/Anchorage', label: 'Alaska Time (AKT)' },
+            { value: 'Pacific/Honolulu', label: 'Hawaii Time (HST)' },
+            { value: 'Europe/London', label: 'Greenwich Mean Time (GMT)' },
+            { value: 'Europe/Paris', label: 'Central European Time (CET)' },
+            { value: 'Europe/Berlin', label: 'Central European Time (CET)' },
+            { value: 'Europe/Moscow', label: 'Moscow Time (MSK)' },
+            { value: 'Asia/Tokyo', label: 'Japan Standard Time (JST)' },
+            { value: 'Asia/Shanghai', label: 'China Standard Time (CST)' },
+            { value: 'Asia/Kolkata', label: 'India Standard Time (IST)' },
+            { value: 'Australia/Sydney', label: 'Australian Eastern Time (AET)' },
+            { value: 'Pacific/Auckland', label: 'New Zealand Standard Time (NZST)' }
+        ];
+
+        function populateTimezones() {
+            const select = document.getElementById('timezoneSelect');
+            timezones.forEach(tz => {
+                const option = document.createElement('option');
+                option.value = tz.value;
+                option.textContent = tz.label;
+                select.appendChild(option);
+            });
+            
+            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const matchingOption = Array.from(select.options).find(option => option.value === userTimezone);
+            if (matchingOption) {
+                matchingOption.selected = true;
+            }
+        }
+
+        function generateShareableUrl() {
+            const time = document.getElementById('timeInput').value;
+            const timezone = document.getElementById('timezoneSelect').value;
+            
+            if (!time || !timezone) {
+                alert('Please select both time and timezone');
+                return;
+            }
+
+            const url = new URL(window.location.href);
+            url.searchParams.set('time', time);
+            url.searchParams.set('tz', timezone);
+            
+            document.getElementById('shareableUrl').href = url.toString();
+            document.getElementById('shareableUrl').textContent = url.toString();
+            document.getElementById('shareableUrlSection').classList.remove('hidden');
+        }
+
+        function copyToClipboard() {
+            const url = document.getElementById('shareableUrl').href;
+            navigator.clipboard.writeText(url).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        function convertTime() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const time = urlParams.get('time');
+            const timezone = urlParams.get('tz');
+            
+            if (time && timezone) {
+                const resultDiv = document.getElementById('conversionResult');
+                const originalTimeDiv = document.getElementById('originalTime');
+                const convertedTimeDiv = document.getElementById('convertedTime');
+                const timezoneInfoDiv = document.getElementById('timezoneInfo');
+                
+                const [hours, minutes] = time.split(':');
+                const originalDate = new Date();
+                originalDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+                
+                const originalTimeString = originalDate.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                    timeZone: timezone
+                });
+                
+                const originalTimezoneAbbr = getTimezoneAbbr(timezone);
+                originalTimeDiv.textContent = `Original time: ${originalTimeString} ${originalTimezoneAbbr}`;
+                
+                const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                const userTimezoneAbbr = getTimezoneAbbr(userTimezone);
+                
+                const convertedDate = new Date();
+                convertedDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+                
+                const convertedTimeString = convertedDate.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                    timeZone: userTimezone
+                });
+                
+                convertedTimeDiv.textContent = `${convertedTimeString} ${userTimezoneAbbr} for you!`;
+                timezoneInfoDiv.textContent = `Your timezone: ${userTimezone}`;
+                
+                resultDiv.classList.add('show');
+                
+                document.querySelector('.time-input-section').style.display = 'none';
+                document.getElementById('shareableUrlSection').style.display = 'none';
+            }
+        }
+
+        function getTimezoneAbbr(timezone) {
+            const date = new Date();
+            const abbr = date.toLocaleString('en-US', {
+                timeZone: timezone,
+                timeZoneName: 'short'
+            }).split(' ').pop();
+            return abbr;
+        }
+
+        window.onload = function() {
+            populateTimezones();
+            convertTime();
+        };
+    </script>
+</body>
+</html>
