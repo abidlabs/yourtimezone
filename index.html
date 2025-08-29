@@ -216,21 +216,65 @@
 
     <script>
         const timezones = [
-            { value: 'America/New_York', label: 'Eastern Time (ET)' },
-            { value: 'America/Chicago', label: 'Central Time (CT)' },
-            { value: 'America/Denver', label: 'Mountain Time (MT)' },
-            { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
-            { value: 'America/Anchorage', label: 'Alaska Time (AKT)' },
-            { value: 'Pacific/Honolulu', label: 'Hawaii Time (HST)' },
-            { value: 'Europe/London', label: 'Greenwich Mean Time (GMT)' },
-            { value: 'Europe/Paris', label: 'Central European Time (CET)' },
-            { value: 'Europe/Berlin', label: 'Central European Time (CET)' },
-            { value: 'Europe/Moscow', label: 'Moscow Time (MSK)' },
-            { value: 'Asia/Tokyo', label: 'Japan Standard Time (JST)' },
-            { value: 'Asia/Shanghai', label: 'China Standard Time (CST)' },
-            { value: 'Asia/Kolkata', label: 'India Standard Time (IST)' },
-            { value: 'Australia/Sydney', label: 'Australian Eastern Time (AET)' },
-            { value: 'Pacific/Auckland', label: 'New Zealand Standard Time (NZST)' }
+            // Americas
+            { value: 'Pacific/Honolulu', label: 'Hawaii Time (HST) GMT-10' },
+            { value: 'America/Anchorage', label: 'Alaska Time (AKT) GMT-9' },
+            { value: 'America/Los_Angeles', label: 'Pacific Time (PT) GMT-8' },
+            { value: 'America/Phoenix', label: 'Arizona Time (MST) GMT-7' },
+            { value: 'America/Denver', label: 'Mountain Time (MT) GMT-7' },
+            { value: 'America/Chicago', label: 'Central Time (CT) GMT-6' },
+            { value: 'America/Mexico_City', label: 'Mexico City (CST) GMT-6' },
+            { value: 'America/New_York', label: 'Eastern Time (ET) GMT-5' },
+            { value: 'America/Toronto', label: 'Toronto (EST) GMT-5' },
+            { value: 'America/Caracas', label: 'Caracas (VET) GMT-4' },
+            { value: 'America/Santiago', label: 'Santiago (CLT) GMT-3' },
+            { value: 'America/Sao_Paulo', label: 'São Paulo (BRT) GMT-3' },
+            { value: 'America/Argentina/Buenos_Aires', label: 'Buenos Aires (ART) GMT-3' },
+            { value: 'Atlantic/Azores', label: 'Azores (AZOT) GMT-1' },
+            
+            // Europe & Africa
+            { value: 'Europe/London', label: 'London (GMT) GMT+0' },
+            { value: 'Europe/Dublin', label: 'Dublin (IST) GMT+1' },
+            { value: 'Europe/Lisbon', label: 'Lisbon (WET) GMT+0' },
+            { value: 'Africa/Lagos', label: 'Lagos (WAT) GMT+1' },
+            { value: 'Europe/Paris', label: 'Paris (CET) GMT+1' },
+            { value: 'Europe/Berlin', label: 'Berlin (CET) GMT+1' },
+            { value: 'Europe/Rome', label: 'Rome (CET) GMT+1' },
+            { value: 'Europe/Madrid', label: 'Madrid (CET) GMT+1' },
+            { value: 'Europe/Amsterdam', label: 'Amsterdam (CET) GMT+1' },
+            { value: 'Europe/Brussels', label: 'Brussels (CET) GMT+1' },
+            { value: 'Europe/Vienna', label: 'Vienna (CET) GMT+1' },
+            { value: 'Europe/Warsaw', label: 'Warsaw (CET) GMT+1' },
+            { value: 'Africa/Cairo', label: 'Cairo (EET) GMT+2' },
+            { value: 'Africa/Johannesburg', label: 'Johannesburg (SAST) GMT+2' },
+            { value: 'Europe/Athens', label: 'Athens (EET) GMT+2' },
+            { value: 'Europe/Helsinki', label: 'Helsinki (EET) GMT+2' },
+            { value: 'Europe/Istanbul', label: 'Istanbul (TRT) GMT+3' },
+            { value: 'Europe/Moscow', label: 'Moscow (MSK) GMT+3' },
+            { value: 'Africa/Nairobi', label: 'Nairobi (EAT) GMT+3' },
+            
+            // Middle East & Asia
+            { value: 'Asia/Dubai', label: 'Dubai (GST) GMT+4' },
+            { value: 'Asia/Karachi', label: 'Karachi (PKT) GMT+5' },
+            { value: 'Asia/Kolkata', label: 'India (IST) GMT+5:30' },
+            { value: 'Asia/Dhaka', label: 'Dhaka (BST) GMT+6' },
+            { value: 'Asia/Bangkok', label: 'Bangkok (ICT) GMT+7' },
+            { value: 'Asia/Jakarta', label: 'Jakarta (WIB) GMT+7' },
+            { value: 'Asia/Singapore', label: 'Singapore (SGT) GMT+8' },
+            { value: 'Asia/Hong_Kong', label: 'Hong Kong (HKT) GMT+8' },
+            { value: 'Asia/Shanghai', label: 'Beijing/Shanghai (CST) GMT+8' },
+            { value: 'Asia/Taipei', label: 'Taipei (CST) GMT+8' },
+            { value: 'Asia/Seoul', label: 'Seoul (KST) GMT+9' },
+            { value: 'Asia/Tokyo', label: 'Tokyo (JST) GMT+9' },
+            
+            // Oceania
+            { value: 'Australia/Perth', label: 'Perth (AWST) GMT+8' },
+            { value: 'Australia/Adelaide', label: 'Adelaide (ACST) GMT+9:30' },
+            { value: 'Australia/Brisbane', label: 'Brisbane (AEST) GMT+10' },
+            { value: 'Australia/Sydney', label: 'Sydney (AEDT) GMT+11' },
+            { value: 'Australia/Melbourne', label: 'Melbourne (AEDT) GMT+11' },
+            { value: 'Pacific/Auckland', label: 'Auckland (NZDT) GMT+13' },
+            { value: 'Pacific/Fiji', label: 'Fiji (FJT) GMT+12' }
         ];
 
         function populateTimezones() {
@@ -291,33 +335,93 @@
                 const timezoneInfoDiv = document.getElementById('timezoneInfo');
                 
                 const [hours, minutes] = time.split(':');
-                const originalDate = new Date();
-                originalDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
                 
-                const originalTimeString = originalDate.toLocaleTimeString('en-US', {
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true,
-                    timeZone: timezone
-                });
+                // Get current date
+                const now = new Date();
                 
+                // Create a date string for today in the format that works universally
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                
+                // Build a date-time string
+                const dateTimeString = `${year}-${month}-${day} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+                
+                // Create dates for multiple possible interpretations and find the right one
+                // Try creating dates at different hours to find which one matches our target time in the source timezone
+                let correctDate = null;
+                
+                // We'll iterate through possible UTC times to find the one that matches our target time in the source timezone
+                // Search around today's date
+                const baseTime = Date.UTC(year, now.getMonth(), now.getDate(), 12, 0, 0);
+                
+                // First try hourly increments
+                for (let offsetHours = -24; offsetHours <= 24; offsetHours++) {
+                    const testTime = baseTime + (offsetHours * 60 * 60 * 1000);
+                    const testDate = new Date(testTime);
+                    
+                    // Check what time this UTC time appears as in the source timezone
+                    const testTimeInSourceTz = testDate.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false,
+                        timeZone: timezone
+                    });
+                    
+                    const targetTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                    
+                    if (testTimeInSourceTz === targetTime) {
+                        correctDate = testDate;
+                        break;
+                    }
+                }
+                
+                // If we couldn't find an exact match with hourly search, try with finer granularity
+                if (!correctDate) {
+                    for (let offsetMinutes = -1440; offsetMinutes <= 1440; offsetMinutes += 15) {
+                        const testTime = baseTime + (offsetMinutes * 60 * 1000);
+                        const testDate = new Date(testTime);
+                        
+                        const testTimeInSourceTz = testDate.toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false,
+                            timeZone: timezone
+                        });
+                        
+                        const targetTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                        
+                        if (testTimeInSourceTz === targetTime) {
+                            correctDate = testDate;
+                            break;
+                        }
+                    }
+                }
+                
+                // Display the original time exactly as entered
+                const originalHour = parseInt(hours);
+                const originalTimeString = `${originalHour % 12 || 12}:${String(minutes).padStart(2, '0')} ${originalHour >= 12 ? 'PM' : 'AM'}`;
                 const originalTimezoneAbbr = getTimezoneAbbr(timezone);
                 originalTimeDiv.textContent = `Original time: ${originalTimeString} ${originalTimezoneAbbr}`;
                 
+                // Get user's timezone
                 const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 const userTimezoneAbbr = getTimezoneAbbr(userTimezone);
                 
-                const convertedDate = new Date();
-                convertedDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-                
-                const convertedTimeString = convertedDate.toLocaleTimeString('en-US', {
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true,
-                    timeZone: userTimezone
-                });
-                
-                convertedTimeDiv.textContent = `${convertedTimeString} ${userTimezoneAbbr} for you!`;
+                // Convert to user's timezone if we found a valid date
+                if (correctDate) {
+                    const convertedTimeString = correctDate.toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true,
+                        timeZone: userTimezone
+                    });
+                    
+                    convertedTimeDiv.textContent = `${convertedTimeString} ${userTimezoneAbbr} for you!`;
+                } else {
+                    // Fallback if conversion failed
+                    convertedTimeDiv.textContent = `Unable to convert time accurately`;
+                }
                 timezoneInfoDiv.textContent = `Your timezone: ${userTimezone}`;
                 
                 resultDiv.classList.add('show');
